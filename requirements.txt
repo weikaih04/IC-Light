@@ -1,5 +1,5 @@
-diffusers==0.27.2
-transformers==4.36.2
+diffusers==0.32.1
+transformers==4.48.0
 opencv-python
 safetensors
 pillow==10.2.0

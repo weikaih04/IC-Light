@@ -12,6 +12,7 @@ import gradio as gr
 import numpy as np
 import torch
 import safetensors.torch as sf
+import json
 
 from PIL import Image
 from diffusers import StableDiffusionPipeline, StableDiffusionImg2ImgPipeline
@@ -21,6 +22,7 @@ from transformers import CLIPTextModel, CLIPTokenizer
 from briarmbg import BriaRMBG
 from enum import Enum
 from torch.hub import download_url_to_file
+from tqdm import tqdm
 
 from gradio_demo import (
     hooked_unet_forward, 
@@ -330,9 +332,16 @@ def main(args):
         split_filenames = [fg_name for fg_name in os.listdir(data_path) if fg_name.endswith(".png")]
         print(f"Processing all {len(split_filenames)} images in the dataset.")
 
-    for fg_name in split_filenames:
+    for fg_name in tqdm(split_filenames):
         input_fg_path = os.path.join(data_path, fg_name)
-        output_path = os.path.join(output_data_path, f"{os.path.splitext(fg_name)[0]}_relight.png")
+        output_dir = os.path.join(output_data_path, args.split)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            
+        output_path = os.path.join(output_data_path, args.split, f"{os.path.splitext(fg_name)[0]}_relight.png")
+        if os.path.exists(output_path):
+            # print(f"Skipping '{fg_name}': Output file '{output_path}' already exists.")
+            continue
         # Load input images
         input_fg = np.array(Image.open(input_fg_path))
 
