@@ -298,14 +298,41 @@ def adjust_dimensions(width, height, max_dim=1024, divisible_by=8):
     return scaled_width, scaled_height
 
 
-if __name__ == "__main__":
-    data_path = "/mnt/sda1/improve_segments/synthetic_100k_AllFilter_no_coco_rgba_no_bg/meta_sa/sa_000000"
-    output_data_path = "/mnt/sdd1/weikai/improve_segment_folder/tmp_dataset/test_iclight"
-    for fg_name in os.listdir(data_path):
-        if not fg_name.endswith(".png"):
-            continue
+def main(args):
+
+    data_path = args.dataset_path
+    output_data_path = args.output_data_path
+
+    # Ensure the output directory exists
+    os.makedirs(output_data_path, exist_ok=True)
+
+    if args.index_json_path is not None:
+        # Load the list of filenames from the JSON file
+        with open(args.index_json_path, 'r') as f:
+            all_filenames = json.load(f)
+        
+        # Validate that all_filenames is a list
+        if not isinstance(all_filenames, list):
+            raise ValueError("The index JSON file must contain a list of filenames.")
+        
+        if args.num_splits < 1:
+            raise ValueError("num_splits must be at least 1.")
+        if args.split < 0 or args.split >= args.num_splits:
+            raise ValueError(f"split index must be between 0 and {args.num_splits - 1}.")
+
+        # Split the list into num_splits parts
+        splits = np.array_split(all_filenames, args.num_splits)
+        split_filenames = splits[args.split]
+
+        print(f"Processing split {args.split + 1}/{args.num_splits} with {len(split_filenames)} images.")
+    else:
+        # If no index_json_path is provided, process all .png files in the dataset_path
+        split_filenames = [fg_name for fg_name in os.listdir(data_path) if fg_name.endswith(".png")]
+        print(f"Processing all {len(split_filenames)} images in the dataset.")
+
+    for fg_name in split_filenames:
         input_fg_path = os.path.join(data_path, fg_name)
-        output_path = os.path.join(output_data_path, f"{fg_name.split('.')[0]}_relight.png")
+        output_path = os.path.join(output_data_path, f"{os.path.splitext(fg_name)[0]}_relight.png")
         # Load input images
         input_fg = np.array(Image.open(input_fg_path))
 
@@ -315,11 +342,11 @@ if __name__ == "__main__":
         # Adjust dimension to maintain aspect ratio and make them divisible by 8
         image_width, image_height = adjust_dimensions(image_width, image_height, max_dim=1024, divisible_by=8)
 
-        print(f"Adjusted dimensions: {image_width} x {image_height}")
+        print(f"Processing '{fg_name}': Adjusted dimensions: {image_width} x {image_height}")
 
         # Define parameters
         # prompt = "beautiful lighting"
-        prompt = "obvious different from the foreground"
+        prompt = "obviously different from the foreground."
         seed = 12345
         steps = 25
         a_prompt = "best quality"
@@ -351,3 +378,20 @@ if __name__ == "__main__":
 
         # Save the output image
         Image.fromarray(results[0]).save(output_path)
+        print(f"Saved relit image to '{output_path}'")
+
+
+if __name__ == "__main__":
+    import argparse
+
+    def parse_args():
+        parser = argparse.ArgumentParser(description="Relight images using Stable Diffusion pipelines.")
+        parser.add_argument('--dataset_path', type=str, required=True, help="Path to the segment dataset")
+        parser.add_argument('--output_data_path', type=str, required=True, help="Path to the output data")
+        parser.add_argument('--num_splits', type=int, default=1, help="Number of splits to create")
+        parser.add_argument('--split', type=int, default=0, help="Split index to process")
+        parser.add_argument('--index_json_path', type=str, default=None, help="Path to the JSON file containing the image filenames")
+        return parser.parse_args()
+    
+    args = parse_args()
+    main(args)
