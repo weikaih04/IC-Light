@@ -308,7 +308,12 @@ def main(args):
     illuminate_prompts_path = args.illuminate_prompts_path
     illuminate_prompts = json.load(open(illuminate_prompts_path))
     
-    record_path = os.path.join(args.record_path, 'record.json')
+    record_path = args.record_path
+    if os.path.exists(record_path):
+        with open(record_path, 'r') as f:
+            records = json.load(f)
+    else:
+        records = {}
 
     # Ensure the output directory exists
     os.makedirs(output_data_path, exist_ok=True)
@@ -358,7 +363,7 @@ def main(args):
 
         # randomly sample from prompts_list
         prompt = np.random.choice(illuminate_prompts)
-        bg_source = np.random.choice([BGSource.None, BGSource.None, BGSource.None, BGSource.None, BGSource.LEFT, BGSource.RIGHT, BGSource.TOP, BGSource.BOTTOM])
+        bg_source = np.random.choice([BGSource.NONE, BGSource.NONE, BGSource.NONE, BGSource.NONE, BGSource.LEFT, BGSource.RIGHT, BGSource.TOP, BGSource.BOTTOM])
         # record the choice for each image
         
 
@@ -394,6 +399,22 @@ def main(args):
         # Save the output image
         Image.fromarray(results[0]).save(output_path)
         print(f"Saved relit image to '{output_path}'")
+        
+        records[fg_name] = {
+            "output_path": output_path,
+            "prompt": prompt,
+            "bg_source": bg_source.value,  # Store the Enum as string
+            "seed": seed,
+            "steps": steps,
+            "cfg": cfg,
+            "highres_scale": highres_scale,
+            "highres_denoise": highres_denoise,
+            "lowres_denoise": lowres_denoise
+        }
+        with open(record_path, 'w') as f:
+            json.dump(records, f, indent=4)
+
+
 
 
 if __name__ == "__main__":

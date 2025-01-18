@@ -4,6 +4,7 @@ NUM_SPLITS=$1
 SPLIT=$2
 DATASET_PATH=$3
 OUTPUT_DATA_PATH=$4
+RECORD_PATH=$5
 
 # Validate inputs
 if [[ -z "$NUM_SPLITS" || -z "$SPLIT" || -z "$DATASET_PATH" || -z "$OUTPUT_DATA_PATH" ]]; then
@@ -19,4 +20,4 @@ python inference.py \
     --split "$SPLIT" \
     --index_json_path "/input/jieyuz2/weikaih/improve_segment/IC-Light/image_index_1_12.json" \
     --illuminate_prompts_path "/input/jieyuz2/weikaih/improve_segment/IC-Light/illumination_prompt.json" \
-    --record_path "/input/jieyuz2/weikaih/improve_segment/IC-Light/$DATASET_PATH.json"
+    --record_path "$RECORD_PATH"
