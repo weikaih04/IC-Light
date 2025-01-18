@@ -23,6 +23,7 @@ from briarmbg import BriaRMBG
 from enum import Enum
 from torch.hub import download_url_to_file
 from tqdm import tqdm
+import json
 
 from gradio_demo import (
     hooked_unet_forward, 
@@ -304,6 +305,10 @@ def main(args):
 
     data_path = args.dataset_path
     output_data_path = args.output_data_path
+    illuminate_prompts_path = args.illuminate_prompts_path
+    illuminate_prompts = json.load(open(illuminate_prompts_path))
+    
+    record_path = os.path.join(args.record_path, 'record.json')
 
     # Ensure the output directory exists
     os.makedirs(output_data_path, exist_ok=True)
@@ -350,12 +355,17 @@ def main(args):
         print(f"Processing '{fg_name}': Adjusted dimensions: {image_width} x {image_height}")
 
         # Define parameters
-        # prompt = "beautiful lighting"
-        prompt = "obviously different from the foreground."
+
+        # randomly sample from prompts_list
+        prompt = np.random.choice(illuminate_prompts)
+        bg_source = np.random.choice([BGSource.None, BGSource.None, BGSource.None, BGSource.None, BGSource.LEFT, BGSource.RIGHT, BGSource.TOP, BGSource.BOTTOM])
+        # record the choice for each image
+        
+
         seed = 12345
         steps = 25
-        a_prompt = "best quality"
-        n_prompt = "lowres, bad anatomy, bad hands, cropped, worst quality"
+        a_prompt = "not obvious objects in the background, best quality"
+        n_prompt = "have obvious objects in the background, lowres, bad anatomy, bad hands, cropped, worst quality"
         cfg = 2.0
         highres_scale = 1.5
         highres_denoise = 0.5
@@ -396,6 +406,8 @@ if __name__ == "__main__":
         parser.add_argument('--num_splits', type=int, default=1, help="Number of splits to create")
         parser.add_argument('--split', type=int, default=0, help="Split index to process")
         parser.add_argument('--index_json_path', type=str, default=None, help="Path to the JSON file containing the image filenames")
+        parser.add_argument('--illuminate_prompts_path', type=str, default=None, help="Path to the JSON file containing the illumination prompts")
+        parser.add_argument('--record_path', type=str, default=None, help="Path to the JSON file containing the record of the prompts used")
         return parser.parse_args()
     
     args = parse_args()
