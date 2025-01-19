@@ -309,11 +309,7 @@ def main(args):
     illuminate_prompts = json.load(open(illuminate_prompts_path))
     
     record_path = args.record_path
-    if os.path.exists(record_path):
-        with open(record_path, 'r') as f:
-            records = json.load(f)
-    else:
-        records = {}
+    records = {}
 
     # Ensure the output directory exists
     os.makedirs(output_data_path, exist_ok=True)
@@ -375,7 +371,6 @@ def main(args):
         highres_scale = 1.5
         highres_denoise = 0.5
         lowres_denoise = 0.9
-        bg_source = BGSource.LEFT
         num_samples = 1  # Adjust as needed
 
         # Process and save the result
@@ -411,8 +406,16 @@ def main(args):
             "highres_denoise": highres_denoise,
             "lowres_denoise": lowres_denoise
         }
-        with open(record_path, 'w') as f:
-            json.dump(records, f, indent=4)
+        
+
+    if os.path.exists(record_path):
+        with open(record_path, 'r') as f:
+            all_records = json.load(f)
+    else:
+        all_records = {}
+    all_records.update(records)
+    with open(record_path, 'w') as f:
+        json.dump(all_records, f, indent=4)
 
 
 
