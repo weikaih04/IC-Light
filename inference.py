@@ -284,21 +284,22 @@ def adjust_dimensions(width, height, max_dim=1024, divisible_by=8):
     cap at max_dim, and make them divisible by a specified value.
     """
     # Calculate aspect ratio
-    aspect_ratio = width / height
+    # aspect_ratio = width / height
 
-    # Determine scaling factor to cap at max_dim
-    if width > height:
-        scaled_width = min(width, max_dim)
-        scaled_height = scaled_width / aspect_ratio
-    else:
-        scaled_height = min(height, max_dim)
-        scaled_width = scaled_height * aspect_ratio
+    # # Determine scaling factor to cap at max_dim
+    # if width > height:
+    #     scaled_width = min(width, max_dim)
+    #     scaled_height = scaled_width / aspect_ratio
+    # else:
+    #     scaled_height = min(height, max_dim)
+    #     scaled_width = scaled_height * aspect_ratio
 
-    # Ensure divisibility by the specified value
-    scaled_width = int((scaled_width // divisible_by) * divisible_by)
-    scaled_height = int((scaled_height // divisible_by) * divisible_by)
+    # # Ensure divisibility by the specified value
+    # scaled_width = int((scaled_width // divisible_by) * divisible_by)
+    # scaled_height = int((scaled_height // divisible_by) * divisible_by)
 
-    return scaled_width, scaled_height
+    # return scaled_width, scaled_height
+    return 1024, 1024
 
 
 def main(args):
@@ -340,7 +341,7 @@ def main(args):
 
     for fg_name in tqdm(split_filenames):
         input_fg_path = os.path.join(data_path, fg_name)            
-        output_path = os.path.join(output_data_path, f"{os.path.splitext(fg_name)[0]}_relight.png")
+        output_path = os.path.join(output_data_path, f"{os.path.splitext(fg_name)[0]}_relight.jpg")
         if os.path.exists(output_path):
             # print(f"Skipping '{fg_name}': Output file '{output_path}' already exists.")
             continue
