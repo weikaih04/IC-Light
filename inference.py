@@ -341,7 +341,7 @@ def main(args):
 
     for fg_name in tqdm(split_filenames):
         input_fg_path = os.path.join(data_path, fg_name)            
-        output_path = os.path.join(output_data_path, f"{os.path.splitext(fg_name)[0]}_relight.jpg")
+        output_path = os.path.join(output_data_path, f"{os.path.splitext(fg_name)[0]}.jpg")
         if os.path.exists(output_path):
             # print(f"Skipping '{fg_name}': Output file '{output_path}' already exists.")
             continue
