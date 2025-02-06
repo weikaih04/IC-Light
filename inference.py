@@ -409,14 +409,14 @@ def main(args):
         }
         
 
-    if os.path.exists(record_path):
-        with open(record_path, 'r') as f:
-            all_records = json.load(f)
-    else:
-        all_records = {}
-    all_records.update(records)
-    with open(record_path, 'w') as f:
-        json.dump(all_records, f, indent=4)
+    # if os.path.exists(record_path):
+    #     with open(record_path, 'r') as f:
+    #         all_records = json.load(f)
+    # else:
+    #     all_records = {}
+    # all_records.update(records)
+    # with open(record_path, 'w') as f:
+    #     json.dump(all_records, f, indent=4)
 
 
 
