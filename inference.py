@@ -369,7 +369,7 @@ def main(args):
         a_prompt = "not obvious objects in the background, best quality"
         n_prompt = "have obvious objects in the background, lowres, bad anatomy, bad hands, cropped, worst quality"
         cfg = 2.0
-        highres_scale = 1.5
+        highres_scale = 1.0
         highres_denoise = 0.5
         lowres_denoise = 0.9
         num_samples = 1  # Adjust as needed
