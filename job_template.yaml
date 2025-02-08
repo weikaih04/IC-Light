@@ -1,0 +1,28 @@
+version: v2
+description: relightening partition job ${JOB_INDEX} of ${TOTAL_JOBS}
+budget: ai2/prior
+tasks:
+- name: segment-data-relightening
+  replicas: 1
+  image:
+    beaker: jieyuz2/semantic-sam-training-v1.11
+  command: ['bash', '-c']
+  arguments:
+  - |
+    /bin/bash inference_1_13.sh ${TOTAL_JOBS} ${JOB_INDEX} "/input/jieyuz2/weikaih/data/mask2former_dataset/datasets/synthetic_data_v3_relight/train" "/input/jieyuz2/weikaih/data/mask2former_dataset/datasets/synthetic_data_v3_relight/train" "/input/jieyuz2/weikaih/data/ic_light_logs/mask2former_relight_v2_2_5.json"
+  datasets:
+  - mountPath: /input
+    source:
+      weka: prior-default
+  result:
+    path: /exp_outputs
+  resources:
+    gpuCount: 1
+    sharedMemory: 100GiB
+  context:
+    priority: low
+    preemptible: true
+  constraints:
+    cluster: [ai2/neptune-cirrascale, ai2/jupiter-cirrascale-2, ai2/saturn-cirrascale, ai2/ceres-cirrascale]
+  hostNetworking: true
+  leaderSelection: true
